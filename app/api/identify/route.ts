@@ -1,42 +1,85 @@
+import { Groq } from 'groq-sdk';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 export const maxDuration = 10;
 
+const groq = new Groq();
+
 async function identifyPlant(base64Image: string) {
-  const apiKey = process.env.PLANT_ID_API_KEY;
+
+  const apiKey = process.env.GROQ_API_KEY;
   
   if (!apiKey) {
     throw new Error('API key not configured');
   }
 
-  const data = {
-    api_key: apiKey,
-    images: [base64Image],
-    modifiers: ["crops_fast", "similar_images"],
-    plant_language: "en",
-    plant_details: ["common_names", "url", "description", "taxonomy"]
-  };
+  const prompt = `What plant is in this image?
+  1. Be specific about the plant type
+  2. Give a certainty score out of 100%
+  3. Provide details of the type of plant
+  4. If the plant is healthy or the disease it might have if unhealthy
+  5. Some information on how to care for the plant
 
-  const response = await fetch('https://api.plant.id/v2/identify', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
+  Format your response as JSON with this structure:
+  {
+    "name": "plant name",
+    "confidence": "certainty percentage",
+    "details": "plant details",
+    "healthy": "if the plant is healthy or the disease it might have if unhealthy",
+    "care": "some information on how to care for the plant"
+  }`;
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Plant.id API error: ${response.status} - ${errorText}`);
+  const imageString = "data:image/jpeg;base64," + base64Image;
+
+  const chatCompletion = await groq.chat.completions.create({
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": prompt
+            },
+            {
+              "type": "image_url",
+              "image_url": {
+                "url": imageString,
+              }
+            }
+          ]
+        }
+      ],
+      "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "temperature": 0.2,
+      "max_completion_tokens": 1024,
+      "top_p": 1,
+      "stream": false,
+      "stop": null
+    });
+
+
+
+  let rawContent = chatCompletion.choices[0].message.content;
+  try {
+    // Remove markdown code block if present
+    if (rawContent.startsWith('```json\n')) {
+      rawContent = rawContent.substring(8, rawContent.lastIndexOf('```'));
+    } else if (rawContent.startsWith('```\n')) {
+      rawContent = rawContent.substring(4, rawContent.lastIndexOf('```'));
+    }
+    const plantInfo = JSON.parse(rawContent);
+    return plantInfo;
+  } catch (error) {
+    console.error('Failed to parse plant info:', error);
+    throw new Error('Invalid response format from API');
   }
 
-  return response.json();
 }
 
 export async function POST(request: Request) {
   try {
-    if (!process.env.PLANT_ID_API_KEY) {
+    if (!process.env.GROQ_API_KEY) {
       return NextResponse.json(
         { error: 'API key not configured' },
         { status: 500 }
@@ -66,29 +109,7 @@ export async function POST(request: Request) {
 
     const result = await identifyPlant(base64Image);
 
-    if (!result.suggestions || result.suggestions.length === 0) {
-      return NextResponse.json(
-        { error: 'No plants identified' },
-        { status: 404 }
-      );
-    }
-
-    const plantInfo = {
-      name: result.suggestions[0].plant_name,
-      confidence: result.suggestions[0].probability,
-      description: result.suggestions[0].plant_details?.description || {
-        value: 'No description available',
-        citation: '',
-        license_name: '',
-        license_url: ''
-      },
-      additionalLabels: result.suggestions.slice(1, 4).map((s: any) => ({
-        name: s.plant_name,
-        score: s.probability
-      }))
-    };
-
-    return NextResponse.json(plantInfo);
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Error in plant identification:', error);
     return NextResponse.json(

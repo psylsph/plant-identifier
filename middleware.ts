@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
  
   // Add API key header if it's an API route
   if (request.nextUrl.pathname.startsWith('/api/')) {
-    requestHeaders.set('x-api-key', process.env.PLANT_ID_API_KEY || '')
+    requestHeaders.set('x-api-key', process.env.GROQ_API_KEY || '')
   }
  
   return NextResponse.next({

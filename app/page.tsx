@@ -5,17 +5,10 @@ import Image from 'next/image';
 
 interface PlantInfo {
   name: string;
-  confidence: number;
-  description: {
-    value: string;
-    citation: string;
-    license_name: string;
-    license_url: string;
-  };
-  additionalLabels?: Array<{
-    name: string;
-    score: number;
-  }>;
+  confidence: string;
+  details: string;
+  healthy: string,
+  care: string;
 }
 
 export default function Home() {
@@ -120,33 +113,19 @@ export default function Home() {
               </h2>
               <div className="mb-4">
                 <div className="text-sm text-green-600 mb-2">
-                  Confidence: {Math.round(result.confidence * 100)}%
+                  Confidence: {result.confidence}
                 </div>
                 <p className="text-gray-700 mb-2">
-                  {typeof result.description === 'string' 
-                    ? result.description 
-                    : result.description.value}
+                  {result.details}
                 </p>
-                {typeof result.description !== 'string' && result.description.citation && (
-                  <div className="text-xs text-gray-500">
-                    Source: <a href={result.description.license_url} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline">
-                      {result.description.citation}
-                    </a>
-                  </div>
-                )}
+                <p className="text-gray-700 mb-2">
+                  <b>Health:</b> {result.healthy}
+                </p>
+                <p className="text-gray-700 mb-2">
+                  <b>Care:</b> {result.care}
+                </p>
+
               </div>
-              {result.additionalLabels && result.additionalLabels.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold text-green-700 mb-2">Other Possibilities:</h3>
-                  <ul className="space-y-2">
-                    {result.additionalLabels.map((label, index) => (
-                      <li key={index} className="text-gray-700">
-                        {label.name} ({Math.round(label.score * 100)}% confidence)
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
           )}
         </div>
