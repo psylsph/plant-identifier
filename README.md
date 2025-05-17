@@ -1,6 +1,6 @@
 # Plant Identifier
 
-A modern web application that helps users identify plants through image recognition technology. Built with Next.js 14, TypeScript, and the Plant.id API.
+A modern web application that helps users identify plants through image recognition technology. Built with Next.js 14, TypeScript, and the Groq API Endpoint.
 
 ## Features
 
@@ -15,7 +15,7 @@ A modern web application that helps users identify plants through image recognit
 - **Framework**: Next.js 14
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-- **API**: Plant.id
+- **API**: Groq
 - **Deployment**: Netlify
 
 ## Getting Started
@@ -31,9 +31,9 @@ cd plant-identifier
 npm install
 ```
 
-3. Create a `.env.local` file in the root directory and add your Plant.id API key:
+3. Create a `.env.local` file in the root directory and add your Groq API key:
 ```env
-PLANT_ID_API_KEY=your-api-key
+GROQ_API_KEY=your-api-key
 ```
 
 4. Run the development server:
@@ -45,7 +45,7 @@ npm run dev
 
 ## Environment Variables
 
-- `PLANT_ID_API_KEY`: Your Plant.id API key
+- `GROQ_API_KEY`: Your Groq API key
 
 ## Deployment
 
