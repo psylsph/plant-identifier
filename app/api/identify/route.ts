@@ -50,10 +50,11 @@ async function identifyPlant(base64Image: string) {
           ]
         }
       ],
-      "model": "meta-llama/llama-4-scout-17b-16e-instruct",
-      "temperature": 0.2,
-      "max_completion_tokens": 1024,
-      "top_p": 1,
+      "model": "qwen/qwen3.6-27b",
+      "temperature": 0.7,
+      "top_p": 0.8,
+      "max_completion_tokens": 4096,
+      "reasoning_format": "hidden",
       "stream": false,
       "stop": null
     });
