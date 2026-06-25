@@ -7,6 +7,9 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Plant Identifier',
   description: 'Identify plants from images using AI',
+  icons: {
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+  },
 };
 
 export default function RootLayout({
@@ -15,10 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-      </head>
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>{children}</body>
     </html>
   );
