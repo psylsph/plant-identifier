@@ -84,6 +84,7 @@ export default function Dropzone({ onFile, disabled }: DropzoneProps) {
         ref={inputRef}
         type="file"
         accept="image/*"
+        capture="environment"
         onChange={handleChange}
         className="hidden"
       />

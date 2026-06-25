@@ -64,7 +64,7 @@ export default function Home() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to identify plant');
+        throw new Error(errorData.details || errorData.error || `Server error (${response.status})`);
       }
 
       const data: PlantInfo = await response.json();
