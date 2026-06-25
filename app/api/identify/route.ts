@@ -9,13 +9,16 @@ const MAX_DIMENSION = 1024;
 const JPEG_QUALITY = 80;
 const MAX_INPUT_BYTES = 20 * 1024 * 1024; // 20MB safety cap
 
-const groq = new Groq();
-
-async function identifyPlant(base64Image: string) {
+function getGroq() {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
     throw new Error('API key not configured');
   }
+  return new Groq({ apiKey });
+}
+
+async function identifyPlant(base64Image: string) {
+  const groq = getGroq();
 
   const prompt = `What plant is in this image?
   1. Be specific about the plant type
